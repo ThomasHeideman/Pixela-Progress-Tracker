@@ -17,14 +17,13 @@ headers = {
     "X-USER-TOKEN": PIXELA_TOKEN
 }
 TODAY = datetime.now()
+text_message=  "Hoeveel minuten heb je vandaag gestudeerd?"
 
-
-#TODO 1: De "Push" Functie (De Reminder)
-def send_telegram_message():
+def send_telegram_message(text):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     params = {
         "chat_id": TELEGRAM_ID,
-        "text": "Hoeveel minuten heb je vandaag gestudeerd?"
+        "text": text
     }
     response = requests.get(url, params=params)
     response.raise_for_status()
@@ -77,7 +76,7 @@ def update_graph():
 if __name__ == "__main__":
     if len(sys.argv) > 1 :
         if sys.argv[1] == "--ask":
-            send_telegram_message()
+            send_telegram_message(text_message)
         elif sys.argv[1] == "--sync":
             update_graph()
         else:
