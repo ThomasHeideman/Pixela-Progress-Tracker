@@ -17,7 +17,7 @@ headers = {
     "X-USER-TOKEN": PIXELA_TOKEN
 }
 TODAY = datetime.now()
-text_message=  "Hoeveel minuten heb je vandaag gestudeerd?"
+text_message=  "Hoeveel minuten heb je vandaag gestudeerd?\n Antwoord met 's [minuten]'"
 
 def send_telegram_message(text):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
@@ -30,26 +30,30 @@ def send_telegram_message(text):
     print("Success! Check your phone!.")
 
 
-
 def get_latest_input():
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/getUpdates"
     response = requests.get(url)
     response.raise_for_status()
-    data = (response.json())
+    data = response.json()
 
     if not data["result"]:
         return None, None
 
-    last_update = data["result"][-1]
-    last_update_id = last_update["update_id"]
-    text_return = last_update["message"]["text"].replace(",", ".")
-    try:
-        value = round(float(text_return))
-        return value, last_update_id
+    last_update_id = data["result"][-1]["update_id"]
 
-    except ValueError:
-        return None, last_update_id
+    for update in reversed(data["result"]):
+        if "text" in update.get("message", {}):
+            text_return = update["message"]["text"]
 
+            if text_return.lower().startswith("s"):
+                clean_text = text_return.lower().replace("s", "").strip().replace(",", ".")
+                try:
+                    value = round(float(clean_text))
+                    return value, last_update_id
+                except ValueError:
+                    pass
+
+    return None, last_update_id
 def mark_as_read(last_id):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/getUpdates"
     params = {"offset": last_id + 1}
