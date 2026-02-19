@@ -65,7 +65,7 @@ def update_graph():
         graph_update_endpoint = f"{PIXELA_ENDPOINT}/{PIXELA_USERNAME}/graphs/{GRAPH_ID}"
         pixel_data = {
         "date":	TODAY.strftime("%Y%m%d"),
-        "quantity":	pixel_update,
+        "quantity":	str(pixel_update),
         }
         response = requests.post(url=graph_update_endpoint,json=pixel_data, headers=headers)
         if response.ok:
